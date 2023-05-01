@@ -25,7 +25,7 @@ function App() {
           </Route>
         )}
         <Route path="*">
-          <Redirect path="/" />
+          <Redirect to="/" />
         </Route>
       </Switch>
     </Layout>
