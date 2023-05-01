@@ -1,8 +1,10 @@
 import classes from "./ProfileForm.module.css";
+import { useHistory } from "react-router-dom";
 import React, { useContext, useRef } from "react";
 import AuthContext from "../../store/auth-context";
 
 const ProfileForm = () => {
+  const redirect = useHistory();
   const authCtx = useContext(AuthContext);
   const passwordRef = useRef("");
   const submitHandler = (e) => {
@@ -26,6 +28,7 @@ const ProfileForm = () => {
       }
     )
       .then((res) => {
+        redirect.replace("/");
         console.log(res, authCtx.token, " data sent");
       })
       .catch((error) => {
