@@ -11,49 +11,56 @@ const AuthForm = () => {
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
   };
-  const submitHandler = async (e) => {
-    try {
-      setShowMessage(true);
-      e.preventDefault();
-      const enteredEmail = emailRef.current.value;
-      const enteredPassword = passwordRef.current.value;
-      console.log("object");
-      if (isLogin) {
-      } else {
-        const response = await fetch(
-          "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCX_lwO9B2S5q_WH3yCDXjFZHeOHUqlMMk",
-          {
-            method: "POST",
-            body: JSON.stringify({
-              email: enteredEmail,
-              password: enteredPassword,
-              returnSecureToken: true,
-            }),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log(" data sent");
-        if (response.ok) {
-          setShowMessage(false);
+  const submitHandler = (e) => {
+    e.preventDefault();
+    const enteredEmail = emailRef.current.value;
+    const enteredPassword = passwordRef.current.value;
+    console.log("object", isLogin);
+    let url;
+    setShowMessage(true);
 
-          console.log(response, "response");
-        } else {
-          let data = await response.json();
-          setShowMessage(false);
-
-          console.log("data", data);
-          let errorMessage = "Authentication Failed";
-          if (data && data.error && data.error.message) {
-            errorMessage = data.error.message;
-          }
-          alert(errorMessage);
-        }
-      }
-    } catch (error) {
-      console.log(error);
+    if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCX_lwO9B2S5q_WH3yCDXjFZHeOHUqlMMk";
+    } else {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCX_lwO9B2S5q_WH3yCDXjFZHeOHUqlMMk";
     }
+    fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        email: enteredEmail,
+        password: enteredPassword,
+        returnSecureToken: true,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        setShowMessage(false);
+        if (res.ok) {
+          console.log("response", res);
+
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            console.log("data", data);
+            let errorMessage = "Authentication Failed";
+            if (data && data.error && data.error.message) {
+              errorMessage = data.error.message;
+            }
+
+            throw new Error(errorMessage);
+          });
+        }
+      })
+      .then((data) => {
+        console.log("success", data);
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   };
 
   return (
